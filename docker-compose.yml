@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+
+  vault-server:
+    image: vault:1.5.3
+    restart: always
+    volumes:
+      - vault-data:/vault/data
+      # - vault-logs:/vault/logs
+      # - vault-file:/vault/file
+      # - vault-config:/vault/config
+    ports:
+      - "8200:8200"    
+    networks:
+      - vault-demo
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: myroot
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: vault-db-example
+    volumes:
+      - vault-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - vault-demo      
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DESIGN: lucas-sandery
+    networks:
+      - vault-demo   
+      
+volumes:
+  vault-data:
+  mysql-data:
+
+
+networks:
+  vault-demo:
+    driver: bridge
+    driver_opts:
+      encrypted: "true"
